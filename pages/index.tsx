@@ -1,5 +1,5 @@
 import Head from 'next/head'
-import { Component, createRef, RefObject } from 'react'
+import { Component, createRef, FormEvent, RefObject } from 'react'
 import styles from '../styles/Home.module.css'
 import { saveAs } from 'file-saver'
 import { NextRouter, useRouter } from 'next/router'
@@ -11,8 +11,8 @@ enum UploadStatus {
     FAILED,
 }
 
-const SubmitControl = (props: any): JSX.Element => {
-    switch (props.status) {
+const SubmitControl = ({status} : {status: UploadStatus}): JSX.Element => {
+    switch (status) {
         case UploadStatus.IDLE:
             return <button type="submit">Upload</button>
         case UploadStatus.UPLOADING:
@@ -72,7 +72,7 @@ class UploadForm extends Component<UploadFormProps, UploadFormState> {
         }
     }
 
-    handleSubmit = async (event: any) => {
+    handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault()
 
         if (
@@ -86,7 +86,7 @@ class UploadForm extends Component<UploadFormProps, UploadFormState> {
 
         this.setState({ status: UploadStatus.UPLOADING, fileName: file.name })
 
-        const formData = new FormData(event.target)
+        const formData = new FormData(event.currentTarget.value)
         formData.append('file', file)
 
         const upload_result = await fetch(
